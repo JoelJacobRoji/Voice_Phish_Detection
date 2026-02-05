@@ -24,8 +24,9 @@ SCAM_KEYWORDS = {
 def keyword_score(text: str):
     """
     Returns:
-        keyword_risk (float): 0–1
-        matched_phrases (list[str])
+        dict with:
+            - keyword_risk (str): "LOW", "MEDIUM", "HIGH"
+            - keyword_hits (list[str]): matched phrases
     """
     text = text.lower()
 
@@ -39,5 +40,16 @@ def keyword_score(text: str):
 
     # Normalize to 0–1
     keyword_risk = min(risk_score, 1.0)
+    
+    # Convert to risk level
+    if keyword_risk >= 0.7:
+        risk_level = "HIGH"
+    elif keyword_risk >= 0.4:
+        risk_level = "MEDIUM"
+    else:
+        risk_level = "LOW"
 
-    return keyword_risk, matched_phrases
+    return {
+        "keyword_risk": risk_level,
+        "keyword_hits": matched_phrases
+    }

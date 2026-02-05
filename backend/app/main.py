@@ -71,8 +71,13 @@ async def analyze_audio(file: UploadFile = File(...)):
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
+        print(f"[DEBUG] Audio file saved to: {temp_path}")
+        print(f"[DEBUG] File size: {os.path.getsize(temp_path)} bytes")
+
         # Run analysis
         result = analyze_call(temp_path)
+
+        print(f"[DEBUG] Analysis result: {result}")
 
         if not result or "risk_score" not in result:
             raise HTTPException(
@@ -86,6 +91,8 @@ async def analyze_audio(file: UploadFile = File(...)):
         raise
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=500,
             detail=f"Internal error: {str(e)}"

@@ -13,11 +13,10 @@ const transcriptText = document.getElementById("transcriptText");
 const fileLabel = document.getElementById("fileLabel");
 
 /**
- * ✅ DEPLOYMENT-SAFE BACKEND URL
- * - Works on localhost
- * - Works after deployment (same domain)
+ * ✅ BACKEND URL - Fixed for local file:// access
+ * Always connect to localhost:8000
  */
-const BACKEND_URL = `${window.location.protocol}//${window.location.hostname}:8000/analyze-audio`;
+const BACKEND_URL = "http://localhost:8000/analyze-audio";
 
 audioInput.addEventListener("change", () => {
     if (audioInput.files.length) {
@@ -50,19 +49,26 @@ analyzeBtn.addEventListener("click", async () => {
         // --------------------
         progressBar.style.width = "25%";
 
+        console.log("Sending request to:", BACKEND_URL);
+        
         const response = await fetch(BACKEND_URL, {
             method: "POST",
             body: formData
         });
 
+        console.log("Response status:", response.status);
+        
         progressBar.style.width = "60%";
         statusText.innerText = "Analyzing content...";
 
         if (!response.ok) {
-            throw new Error(`Backend returned ${response.status}`);
+            const errorText = await response.text();
+            console.error("Error response:", errorText);
+            throw new Error(`Backend returned ${response.status}: ${errorText}`);
         }
 
         const data = await response.json();
+        console.log("Analysis result:", data);
 
         // --------------------
         // Finalize
@@ -113,7 +119,18 @@ analyzeBtn.addEventListener("click", async () => {
 
     } catch (err) {
         console.error("Analysis failed:", err);
-        alert("Failed to analyze audio. Backend is running, but analysis failed.");
+        
+        let errorMessage = "Failed to analyze audio. ";
+        
+        if (err.message.includes("Failed to fetch")) {
+            errorMessage += "Cannot connect to backend. Make sure the server is running on http://localhost:8000";
+        } else if (err.message.includes("NetworkError")) {
+            errorMessage += "Network error. Check if backend is accessible.";
+        } else {
+            errorMessage += err.message;
+        }
+        
+        alert(errorMessage);
 
         progressBar.style.width = "0%";
         statusText.classList.add("hidden");
