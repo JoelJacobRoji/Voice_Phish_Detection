@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual environment
+venv/
+.env
+
+# Temp files
+temp/
+*.wav
+*.mp3
+*.m4a
+*.ogg
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Models (optional – remove if you WANT them in GitHub)
+aiml/artifacts/*.pkl
