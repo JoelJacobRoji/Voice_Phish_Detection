@@ -1,107 +1,67 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from aiml.scam_analyzer import analyze_call
 import os
+import tempfile
 import shutil
-import uuid
 
-app = FastAPI(
-    title="Audio Call Scam Analyzer",
-    description="API to analyze audio calls for scam risk using speech, text, and voice features",
-    version="1.0.0"
-)
+# -----------------------------
+# Safe AIML import (Render-safe)
+# -----------------------------
+try:
+    from aiml.scam_analyzer import analyze_call
+    MODEL_READY = True
+except Exception as e:
+    print("⚠️ AIML not ready:", e)
+    analyze_call = None
+    MODEL_READY = False
 
-# --------------------------------------------------
-# CORS (frontend + cloud deployment safe)
-# --------------------------------------------------
+# -----------------------------
+# FastAPI App
+# -----------------------------
+app = FastAPI(title="Audio Scam Analyzer")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # restrict in production
+    allow_origins=["*"],   # dev-safe
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --------------------------------------------------
-# Root & health routes
-# --------------------------------------------------
-@app.get("/")
-def root():
-    return {
-        "message": "Audio Call Scam Analyzer API is running",
-        "endpoints": {
-            "analyze_audio": "POST /analyze-audio",
-            "health": "GET /health"
-        }
-    }
-
+# -----------------------------
+# Health Check
+# -----------------------------
 @app.get("/health")
 def health():
     return {
         "status": "ok",
-        "service": "audio-scam-analyzer"
+        "service": "audio-scam-analyzer",
+        "model_ready": MODEL_READY
     }
 
-# --------------------------------------------------
-# Audio analysis endpoint
-# --------------------------------------------------
+# -----------------------------
+# Audio Analysis API
+# -----------------------------
 @app.post("/analyze-audio")
 async def analyze_audio(file: UploadFile = File(...)):
 
-    # ---------- VALIDATION ----------
-    allowed_extensions = (".wav", ".mp3", ".m4a", ".ogg")
-    filename = file.filename.lower()
-
-    if not (
-        (file.content_type and file.content_type.startswith("audio/"))
-        or filename.endswith(allowed_extensions)
-    ):
+    if not MODEL_READY:
         raise HTTPException(
-            status_code=400,
-            detail="Uploaded file must be an audio file"
+            status_code=503,
+            detail="Model not ready on server"
         )
 
-    # ---------- TEMP FILE ----------
-    os.makedirs("temp", exist_ok=True)
-    temp_filename = f"{uuid.uuid4()}_{file.filename}"
-    temp_path = os.path.join("temp", temp_filename)
+    # Save temp audio
+    suffix = os.path.splitext(file.filename)[1]
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        shutil.copyfileobj(file.file, tmp)
+        temp_path = tmp.name
 
     try:
-        # Save uploaded file
-        with open(temp_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-
-        print(f"[DEBUG] Audio file saved to: {temp_path}")
-        print(f"[DEBUG] File size: {os.path.getsize(temp_path)} bytes")
-
-        # Run analysis
         result = analyze_call(temp_path)
-
-        print(f"[DEBUG] Analysis result: {result}")
-
-        if not result or "risk_score" not in result:
-            raise HTTPException(
-                status_code=500,
-                detail="Analysis failed or returned invalid result"
-            )
-
         return result
-
-    except HTTPException:
-        raise
-
     except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal error: {str(e)}"
-        )
-
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
-        # Cleanup
-        try:
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
-        except Exception:
-            pass
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
