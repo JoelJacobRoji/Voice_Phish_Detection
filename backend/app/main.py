@@ -5,7 +5,7 @@ import tempfile
 import shutil
 
 # -----------------------------
-# Safe AIML import (Render-safe)
+# Safe AIML import (Railway-safe)
 # -----------------------------
 try:
     from aiml.scam_analyzer import analyze_call
@@ -22,7 +22,7 @@ app = FastAPI(title="Audio Scam Analyzer")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # dev-safe
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -51,8 +51,10 @@ async def analyze_audio(file: UploadFile = File(...)):
             detail="Model not ready on server"
         )
 
-    # Save temp audio
-    suffix = os.path.splitext(file.filename)[1]
+    suffix = os.path.splitext(file.filename)[1].lower()
+    if suffix not in [".wav", ".mp3", ".m4a"]:
+        raise HTTPException(status_code=400, detail="Unsupported file type")
+
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
         shutil.copyfileobj(file.file, tmp)
         temp_path = tmp.name
