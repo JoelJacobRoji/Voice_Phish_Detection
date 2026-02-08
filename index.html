@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Audio Call Analyzer</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- Title -->
+    <h1 class="title">Audio Call Analyzer</h1>
+
+    <!-- Main Container -->
+    <div class="main-box">
+
+        <!-- Upload box -->
+        <label class="upload-box">
+            <input type="file" id="audioFile" accept=".wav,.mp3" hidden />
+            <span id="fileLabel">Select the audio file</span>
+        </label>
+
+        <!-- Button -->
+        <button id="analyzeBtn">Analyze Audio</button>
+
+        <!-- Status text -->
+        <p id="statusText" class="status-text hidden">Uploading audio...</p>
+
+        <!-- Progress bar -->
+        <div class="progress-container hidden" id="progressContainer">
+            <div id="progress-bar"></div>
+        </div>
+
+        <!-- Result -->
+        <div id="result" class="result-box hidden">
+            <h2>Analysis Result</h2>
+
+            <h3 id="riskLevel"></h3>
+            <p><strong>Scam Score:</strong> <span id="riskScore"></span>%</p>
+
+            <h4>Detected Reasons</h4>
+            <ul id="reasonList"></ul>
+
+            <h4>Transcript</h4>
+            <div class="transcript-box" id="transcriptText"></div>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <h3>Developed by Unsupervised Coders &copy; 2026</h3>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
