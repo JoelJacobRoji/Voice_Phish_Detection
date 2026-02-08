@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: voice-phish-detection
+    runtime: python
+    pythonVersion: 3.11.6
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
