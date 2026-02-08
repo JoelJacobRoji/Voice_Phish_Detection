@@ -13,10 +13,12 @@ const transcriptText = document.getElementById("transcriptText");
 const fileLabel = document.getElementById("fileLabel");
 
 /**
- * ✅ BACKEND URL - Fixed for local file:// access
- * Always connect to localhost:8000
+ * ✅ BACKEND URL (Production - Railway)
+ * Used by GitHub Pages frontend
  */
-const BACKEND_URL = "http://localhost:8000/analyze-audio";
+
+const BACKEND_URL = "https://voicephishdetection-production.up.railway.app/analyze-audio";
+
 
 audioInput.addEventListener("change", () => {
     if (audioInput.files.length) {
