@@ -8,9 +8,34 @@
 
 ---
 
-**Visit our Live Website** - [Voice_Phish_Detector](https://joeljacobroji.github.io/Voice_Phish_Detection/)
+## Visit our Live Website - [Voice_Phish_Detector](https://joeljacobroji.github.io/Voice_Phish_Detection/)
 
 ---
+
+##  Demo Screenshots
+
+<p align="center">
+  <img src="images/Real.png" width="45%">
+  <img src="images/Fake.png" width="45%">
+</p>
+
+<p align="center">
+  <em>Left: Screenshot of real audio analysis | Right: Screenshot of fake audio analysis</em>
+</p>
+
+---
+
+### ⚠️ Note on the Live Demo
+Currently, the live frontend hosted on GitHub Pages is configured for local development and is attempting to connect to a local backend (`http://localhost:8000`). Because of this, clicking "Analyze Audio" on the live site will currently return a connection error. 
+
+The backend API is fully built and deployed on Railway. I am currently working on updating the frontend's environment configuration to point to the production Railway URL and setting up the appropriate CORS middleware to connect the two live services.
+
+**How to test the project:**
+The application works perfectly in a local environment! To test the audio analyzer:
+1. Clone this repository.
+2. Start the backend server locally on port `8000`.
+3. Open the `index.html` file in your browser.
+
 
 ## 🎯 Overview
 
@@ -113,12 +138,12 @@ http://localhost:3000/index.html
 ┌──────────────────────────────┐
 │      AI/ML Pipeline          │
 ├──────────────────────────────┤
-│ • Whisper (Speech-to-Text)  │
+│ • Whisper (Speech-to-Text)   │
 │ • Text Preprocessing         │
-│ • ML Scam Detection         │
-│ • Keyword Engine            │
-│ • Audio Feature Extraction  │
-│ • Risk Scoring & Fusion     │
+│ • ML Scam Detection          │
+│ • Keyword Engine             │
+│ • Audio Feature Extraction   │
+│ • Risk Scoring & Fusion      │
 └──────────────────────────────┘
 ```
 
@@ -198,6 +223,9 @@ Audio_Call_Analyzer/
 │   ├── index.html
 │   ├── script.js
 │   └── style.css
+├── images
+│   ├── Real.png
+│   └── Fake.png
 │
 ├── START.bat             # Quick launcher
 ├── serve_frontend.py     # Frontend server
@@ -409,8 +437,4 @@ This project is part of **HCL GUVI Hackathon 2026**
 
 ---
 
-**⭐ If you find this project useful, please give it a star!**
-
----
-
-Made with ❤️ by Unsupervised Coders
+Made by Unsupervised Coders
